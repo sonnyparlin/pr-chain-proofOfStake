@@ -42,7 +42,7 @@ class Blockchain():
             return True
         sender_balance = self.accountModel.get_balance(
             transaction.sender_address)
-        return sender_balance >= transaction.amount
+        return sender_balance >= sum(transaction.outputs.values())
 
     def execute_transactions(self, transactions):
         for transaction in transactions:
@@ -50,7 +50,10 @@ class Blockchain():
 
     def execute_transaction(self, transaction):
         sender = transaction.sender_address
-        receiver = transaction.receiver_address
-        amount = transaction.amount
-        self.accountModel.update_balance(sender, -amount)
-        self.accountModel.update_balance(receiver, amount)
+        receivers = transaction.outputs.keys()
+
+        for receiver in receivers:
+            self.accountModel.update_balance(sender, - transaction.outputs[receiver])
+            self.accountModel.update_balance(receiver, transaction.outputs[receiver])
+        
+        #print(self.accountModel.get_balance(transaction.sender_address))

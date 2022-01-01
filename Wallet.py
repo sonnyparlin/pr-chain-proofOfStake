@@ -2,6 +2,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from BlockchainUtils import BlockchainUtils
 from Transaction import Transaction
+from TransactionPool import TransactionPool
 from Block import Block
 import uuid
 
@@ -21,15 +22,22 @@ class Wallet():
         return self.keyPair.publickey().exportKey('PEM').decode('utf-8')
 
     def create_transaction(self, receiver, amount, type):
-        transaction = Transaction(
-            self.address, receiver, amount, type)
-        signature = self.sign(transaction.payload())
-        transaction.add_signature(signature)
+        pool = TransactionPool()
+        transaction = None
+
+        if not pool.transaction_exists(self):
+            transaction = Transaction(
+            sender_address=self.address, receiver=receiver, amount=amount, outputs=None, type=type)
+            signature = self.sign(transaction.payload())
+            transaction.add_signature(signature)
+        else:
+            pool.update_transaction(receiver, amount)
+
         return transaction
 
     def create_block(self, transactions, last_hash, block_count):
         block = Block(transactions, last_hash, 
-            self.publicKeyString(), block_count)
+            self.address, block_count)
         signature = self.sign(block.payload())
         block.add_signature(signature)
         return block
