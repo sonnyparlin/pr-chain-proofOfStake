@@ -37,7 +37,6 @@ class NodeAPI(FlaskView):
         values = request.get_json()
         if not 'transaction' in values:
             return "missing transaction values", 400
-        
         transaction = BlockchainUtils.decode(values['transaction'])
         node.handle_transaction(transaction)
         response = {'message': 'Received transaction'}

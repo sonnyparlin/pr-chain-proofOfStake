@@ -1,11 +1,4 @@
-from Transaction import Transaction
-from Wallet import Wallet
-from TransactionPool import TransactionPool
-from Block import Block
-from Blockchain import Blockchain
-from BlockchainUtils import BlockchainUtils
 from Node import Node
-from config import TX_TYPE_EXCHANGE, TX_TYPE_TRANSFER, Pprint
 import sys
 
 def main():
@@ -18,9 +11,7 @@ def main():
 
     node = Node(ip, port, key_file)
     node.startP2P()
-    node.startAPI(api_port)
-
-    
+    node.startAPI(api_port)  
 
 if __name__ == '__main__':
     main()

@@ -42,5 +42,5 @@ class TransactionPool():
                 new_pool_transactions.append(pool_transaction)
         self.transactions = new_pool_transactions
 
-    def forger_required(self):
-        return len(self.transactions) >= 1
+    def forging_required(self):
+        return len(self.transactions) >= 3

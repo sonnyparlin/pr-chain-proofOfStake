@@ -15,7 +15,7 @@ class ProofOfStake():
         if publicKeyString in self.stakers.keys():
             self.stakers[publicKeyString] += stake
         else:
-            self.stakers[publicKeyString] = stake
+            self.stakers[publicKeyString] = stake 
 
     def get(self, publicKeyString):
         if publicKeyString in self.stakers.keys():

@@ -4,19 +4,14 @@ import copy
 
 class Transaction():
 
-    def __init__(self, 
-                sender=None,
-                sender_public_key=None,
-                receiver=None,
-                amount=None, 
-                outputs=None, 
-                type=None):
+    def __init__(self, sender, receiver, amount, type):
         self.sender_address = sender.address
         self.sender_public_key = sender.publicKeyString()
         self.receiver_address = receiver.address
+        self.receiver_public_key = receiver.publicKeyString()
         self.amount = amount
-        self.outputs = outputs or self.create_output(
-            receiver.address, 
+        self.outputs = self.create_output(
+            self.receiver_address, 
             self.amount
         )
         self.type = type
@@ -33,17 +28,7 @@ class Transaction():
         return outputs
 
     def to_json(self):
-        #return self.__dict__
-        data = {}
-        data['sender_address'] = self.sender_address
-        data['outputs'] = self.outputs
-        data['amount'] = self.amount
-        data['signature'] = self.signature
-        data['type'] = self.type
-        data['id'] = self.id
-        data['timestamp'] = self.timestamp
-        data['signature'] = self.signature
-        return data
+        return self.__dict__
 
     def add_signature(self, signature):
         self.signature = signature

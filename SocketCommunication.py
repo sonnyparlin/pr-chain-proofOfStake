@@ -37,7 +37,6 @@ class SocketCommunication(Node):
             self.node.handle_transaction(transaction)
         elif message.message_type == 'BLOCK':
             block = message.data
-            print(f'block: {block.payload()}')
             self.node.handle_block(block)
         elif message.message_type == 'BLOCKCHAINREQUEST':
             self.node.handle_blockchain_request(connected_node)

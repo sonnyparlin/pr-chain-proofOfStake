@@ -3,32 +3,40 @@ from BlockchainUtils import BlockchainUtils
 import requests
 from config import TX_TYPE_EXCHANGE, TX_TYPE_TRANSFER
 
-if __name__ == '__main__':
-    bob = Wallet()
-    alice = Wallet()
-    exchange = Wallet()
-    paul = Wallet()
-
-    transaction = exchange.create_transaction(alice, 100, type=TX_TYPE_EXCHANGE)
+def post_transaction(sender, receiver, amount, type):
+    transaction = sender.create_transaction(receiver, amount, type=type)
     url = 'http://localhost:5100/transact'
     package = {'transaction': BlockchainUtils.encode(transaction)}
     request = requests.post(url, json=package)
-    print(request.text)
+    print(request.json())
 
-    # transaction = alice.create_transaction(bob, 5, type=TX_TYPE_EXCHANGE)
-    # url = 'http://localhost:5100/transact'
-    # package = {'transaction': BlockchainUtils.encode(transaction)}
-    # request = requests.post(url, json=package)
-    # print(request.text)
+if __name__ == '__main__':
+    bob = Wallet()
+    alice = Wallet()
+    alice.from_key('keys/stakerPrivateKey.pem')
+    exchange = Wallet()
+    paul = Wallet()
 
-    # transaction = alice.create_transaction(bob, 5, type=TX_TYPE_EXCHANGE)
-    # url = 'http://localhost:5100/transact'
-    # package = {'transaction': BlockchainUtils.encode(transaction)}
-    # request = requests.post(url, json=package)
-    # print(request.text)
+    #forger: genesis
+    post_transaction(exchange, alice, 100, 'EXCHANGE')
+    post_transaction(exchange, bob, 100, 'EXCHANGE')
+    post_transaction(exchange, bob, 10, 'EXCHANGE')
 
-    # transaction = alice.create_transaction(paul, 5, type=TX_TYPE_EXCHANGE)
-    # url = 'http://localhost:5100/transact'
-    # package = {'transaction': BlockchainUtils.encode(transaction)}
-    # request = requests.post(url, json=package)
-    # print(request.text)
+    # forger: probably alice
+    post_transaction(alice, alice, 25, 'STAKE')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    
+    

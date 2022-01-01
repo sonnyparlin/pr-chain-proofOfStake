@@ -27,11 +27,9 @@ class Wallet():
         return self.keyPair.publickey().exportKey('PEM').decode('utf-8')
 
     def create_transaction(self, receiver, amount, type):
-        transaction = Transaction(
-        sender=self, receiver=receiver, amount=amount, outputs=None, type=type, sender_public_key=self.publicKeyString())
+        transaction = Transaction(self, receiver, amount, type)
         signature = self.sign(transaction.payload())
         transaction.add_signature(signature)
-
         return transaction
 
     def create_block(self, transactions, last_hash, block_count):
@@ -45,7 +43,6 @@ class Wallet():
     def valid_signature(data, signature, publicKeyString):
         signature = bytes.fromhex(signature)
         dataHash = BlockchainUtils.hash(data)
-        print(f'publicKeyString: {publicKeyString}')
         publicKey = RSA.importKey(publicKeyString)
         signatureSchemeObject = PKCS1_v1_5.new(publicKey)
         return signatureSchemeObject.verify(dataHash, signature)
