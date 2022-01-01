@@ -38,7 +38,6 @@ class Node():
         transaction_exists = self.transaction_pool.transaction_from_pool(transaction.sender_address)
         transaction_in_block = self.blockchain.transaction_exists(transaction)
 
-
         if not transaction_exists and not transaction_in_block and signature_valid:
             self.transaction_pool.add_transaction(transaction)
             add_or_update = True
@@ -54,6 +53,24 @@ class Node():
             if forgingRequired:
                 self.forge()
 
+    def handle_block(self, block):
+        forger = block.forger
+        block_hash = block.payload()
+        signature = block.signature
+
+        block_count_valid = self.blockchain.block_count_valid(block)
+        last_block_hash_valid = self.blockchain.last_block_hash_valid(block)
+        forger_valid = self.blockchain.forger_valid(block)
+        transactions_valid = self.blockchain.transactions_valid(block.transactions)
+        signature_valid = Wallet.valid_signature(block_hash, signature, forger)
+        if last_block_hash_valid and forger_valid and transactions_valid and signature_valid and block_count_valid:
+            self.blockchain.add_block(block)
+            self.transaction_pool.remove_from_pool(block.transactions)
+            message = Message(self.p2p.socketConnector, 'BLOCK', block)
+            encoded_message = BlockchainUtils.encode(message)
+            self.p2p.broadcast(encoded_message)
+
+
     def forge(self):
         forger = self.blockchain.next_forger()
         if forger == self.wallet.publicKeyString():
@@ -65,5 +82,4 @@ class Node():
             self.p2p.broadcast(encoded_message)
         else:
             print('i am not the next forger')
-            time.sleep(10)
         return

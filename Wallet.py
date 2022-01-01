@@ -36,7 +36,7 @@ class Wallet():
 
     def create_block(self, transactions, last_hash, block_count):
         block = Block(transactions, last_hash, 
-            self.address, block_count)
+            self.publicKeyString(), block_count)
         signature = self.sign(block.payload())
         block.add_signature(signature)
         return block
@@ -45,6 +45,7 @@ class Wallet():
     def valid_signature(data, signature, publicKeyString):
         signature = bytes.fromhex(signature)
         dataHash = BlockchainUtils.hash(data)
+        print(f'publicKeyString: {publicKeyString}')
         publicKey = RSA.importKey(publicKeyString)
         signatureSchemeObject = PKCS1_v1_5.new(publicKey)
         return signatureSchemeObject.verify(dataHash, signature)
