@@ -11,8 +11,10 @@ import sys
 def main():
     ip = sys.argv[1]
     port = int(sys.argv[2])
+    api_port = int(sys.argv[3])
     node = Node(ip, port)
     node.startP2P()
+    node.startAPI(api_port)
 
     
 

@@ -5,16 +5,18 @@ import copy
 class Transaction():
 
     def __init__(self, 
-                sender_address=None, 
-                receiver=None, 
+                sender=None,
+                sender_public_key=None,
+                receiver=None,
                 amount=None, 
                 outputs=None, 
                 type=None):
-        self.sender_address = sender_address
-        self.receiver = receiver
+        self.sender_address = sender.address
+        self.sender_public_key = sender.publicKeyString()
+        self.receiver_address = receiver.address
         self.amount = amount
         self.outputs = outputs or self.create_output(
-            self.receiver, 
+            receiver.address, 
             self.amount
         )
         self.type = type
