@@ -16,7 +16,7 @@ class PeerDiscoveryHandler():
 
     def status(self):
         while True:
-            print('Current Connections: \n')
+            print('Current Connections: ')
             for peer in self.socket_communication.peers:
                 print(str(peer.ip) + ':' + str(peer.port))
             time.sleep(10)

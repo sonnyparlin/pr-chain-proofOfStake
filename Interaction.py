@@ -15,20 +15,20 @@ if __name__ == '__main__':
     request = requests.post(url, json=package)
     print(request.text)
 
-    transaction = alice.create_transaction(bob, 5, type=TX_TYPE_EXCHANGE)
-    url = 'http://localhost:5100/transact'
-    package = {'transaction': BlockchainUtils.encode(transaction)}
-    request = requests.post(url, json=package)
-    print(request.text)
+    # transaction = alice.create_transaction(bob, 5, type=TX_TYPE_EXCHANGE)
+    # url = 'http://localhost:5100/transact'
+    # package = {'transaction': BlockchainUtils.encode(transaction)}
+    # request = requests.post(url, json=package)
+    # print(request.text)
 
-    transaction = alice.create_transaction(bob, 5, type=TX_TYPE_EXCHANGE)
-    url = 'http://localhost:5100/transact'
-    package = {'transaction': BlockchainUtils.encode(transaction)}
-    request = requests.post(url, json=package)
-    print(request.text)
+    # transaction = alice.create_transaction(bob, 5, type=TX_TYPE_EXCHANGE)
+    # url = 'http://localhost:5100/transact'
+    # package = {'transaction': BlockchainUtils.encode(transaction)}
+    # request = requests.post(url, json=package)
+    # print(request.text)
 
-    transaction = alice.create_transaction(paul, 5, type=TX_TYPE_EXCHANGE)
-    url = 'http://localhost:5100/transact'
-    package = {'transaction': BlockchainUtils.encode(transaction)}
-    request = requests.post(url, json=package)
-    print(request.text)
+    # transaction = alice.create_transaction(paul, 5, type=TX_TYPE_EXCHANGE)
+    # url = 'http://localhost:5100/transact'
+    # package = {'transaction': BlockchainUtils.encode(transaction)}
+    # request = requests.post(url, json=package)
+    # print(request.text)

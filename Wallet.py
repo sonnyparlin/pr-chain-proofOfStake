@@ -10,6 +10,12 @@ class Wallet():
     def __init__(self):
         self.keyPair = RSA.generate(2048)
         self.address = 'prawnv1' + uuid.uuid1().hex
+    
+    def from_key(self, file):
+        key = ''
+        with open(file, 'r') as key_file:
+            key = RSA.importKey(key_file.read())
+        self.keyPair = key
 
     def sign(self, data):
         dataHash = BlockchainUtils.hash(data)

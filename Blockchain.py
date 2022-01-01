@@ -1,12 +1,14 @@
 from Block import Block
 from BlockchainUtils import BlockchainUtils
 from AccountModel import AccountModel
+from ProofOfStake import ProofOfStake
 from config import TX_TYPE_EXCHANGE
 
 class Blockchain():
     def __init__(self):
         self.blocks = [Block.genesis()]
         self.accountModel = AccountModel()
+        self.pos = ProofOfStake()
 
     def add_block(self, block):
         self.execute_transactions(block.transactions)
@@ -49,11 +51,38 @@ class Blockchain():
             self.execute_transaction(transaction)
 
     def execute_transaction(self, transaction):
-        sender = transaction.sender_address
-        receivers = transaction.outputs.keys()
+        if transaction.type == 'STAKE':
+            sender = transaction.sender_public_key
+            receiver = transaction.receiver_public_key
+            if sender == receiver:
+                amount = transaction.amount
+                self.pos.update(sender, amount)
+                self.accountModel.update_balance(sender, -amount)
+            else:
 
-        for receiver in receivers:
-            self.accountModel.update_balance(sender, - transaction.outputs[receiver])
-            self.accountModel.update_balance(receiver, transaction.outputs[receiver])
-        
-        #print(self.accountModel.get_balance(transaction.sender_address))
+                sender = transaction.sender_address
+                receivers = transaction.outputs.keys()
+
+                for receiver in receivers:
+                    self.accountModel.update_balance(sender, - transaction.outputs[receiver])
+                    self.accountModel.update_balance(receiver, transaction.outputs[receiver])
+                    
+    def next_forger(self):
+        last_hash = BlockchainUtils.hash(self.blocks[-1].payload()).hexdigest()
+        return self.pos.forger(last_hash)
+
+    def create_block(self, transaction_from_pool, forger_wallet):
+        covered_transactions = self.get_covered_transactions_set(transaction_from_pool)
+        new_block = forger_wallet.create_block(
+            covered_transactions, 
+            BlockchainUtils.hash(self.blocks[-1].payload()).hexdigest(),
+            len(self.blocks))
+        self.blocks.append(new_block)
+        return new_block
+
+    def transaction_exists(self, transaction):
+        for block in self.blocks:
+            for block_transaction in block.transactions:
+                if transaction.equals(block_transaction):
+                    return True
+        return False
