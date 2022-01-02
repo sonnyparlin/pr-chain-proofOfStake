@@ -45,11 +45,14 @@ class Blockchain():
                 print('Transaction is not covered by sender')
         return covered_transactions
 
+    def get_balance(self, publickey):
+        return self.accountModel.get_balance(publickey)
+
     def transaction_covered(self, transaction):
         if transaction.type == 'EXCHANGE':
             return True
         sender_balance = self.accountModel.get_balance(
-            transaction.sender_public_key)
+            transaction.sender_address)
         print(f'sender_balance: {sender_balance}')
         return sender_balance >= transaction.amount
 
@@ -58,13 +61,13 @@ class Blockchain():
             self.execute_transaction(transaction)
 
     def execute_transaction(self, transaction):
-        sender = transaction.sender_public_key
-        receiver = transaction.receiver_public_key
+        sender = transaction.sender_address
+        receiver = transaction.receiver_address
         amount = transaction.amount
 
         if transaction.type == 'STAKE':
             if sender == receiver:
-                self.pos.update(sender, amount)
+                self.pos.update(transaction.sender_public_key, amount)
                 self.accountModel.update_balance(sender, -amount)
         else:              
             self.accountModel.update_balance(sender, -amount)

@@ -21,6 +21,12 @@ class NodeAPI(FlaskView):
     def info(self):
         return 'This is the beginning of our API', 200
 
+    @route('/wallet/<address>', methods=['GET'])
+    def get_wallet_info(self, address):
+        balance = node.handle_balance_request(address)
+        json_string = {"address": address, "balance": balance}
+        return jsonify(json_string), 200
+
     @route('/blockchain', methods=['GET'])
     def blockchain(self):
         return node.blockchain.to_json(), 200

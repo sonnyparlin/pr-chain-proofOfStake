@@ -29,6 +29,9 @@ class Node():
         self.api.inject_node(self)
         self.api.start(port)
 
+    def handle_balance_request(self, publickey):
+        return self.blockchain.get_balance(publickey)
+
     def handle_transaction(self, transaction):
         data = transaction.payload()
         signature = transaction.signature
