@@ -14,7 +14,7 @@ Start a new staking node
 python Main.py localhost 10002 5101 keys/stakerPrivateKey.pem 
 ```
 
-### Start an additional non staking node (as many as you want, just make sure they have unique node and api ports)
+Start an additional non staking node (as many as you want, just make sure they have unique node and api ports)
 ```
 python Main.py localhost 10002 5101
 ```
