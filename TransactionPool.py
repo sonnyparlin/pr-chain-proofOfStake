@@ -15,17 +15,6 @@ class TransactionPool():
                 return True
         return False
 
-    def update_transaction(self, transaction, receiver, amount):
-        """
-        Update the transaction with a new or existing recipient
-        """
-        for address in list(transaction.outputs.keys()):
-            if address == receiver:
-                transaction.outputs[receiver] += amount
-            else:
-                transaction.outputs[receiver] = amount
-
-
     def transaction_from_pool(self, sender_address):
         for pool_transaction in self.transactions:
             if pool_transaction.sender_address == sender_address:

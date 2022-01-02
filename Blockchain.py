@@ -51,7 +51,7 @@ class Blockchain():
         sender_balance = self.accountModel.get_balance(
             transaction.sender_public_key)
         print(f'sender_balance: {sender_balance}')
-        return sender_balance >= sum(transaction.outputs.values())
+        return sender_balance >= transaction.amount
 
     def execute_transactions(self, transactions):
         for transaction in transactions:
