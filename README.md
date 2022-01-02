@@ -43,6 +43,7 @@ def post_transaction(sender, receiver, amount, type):
     print(request.json())
 
 # example purchase by alice of 100 Prawns
+exchange = Wallet() # special wallet used for forging coins
 alice = Wallet()
 post_transaction(exchange, alice, 100, 'EXCHANGE')
 
