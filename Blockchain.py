@@ -104,13 +104,13 @@ class Blockchain():
         for tx in covered_transactions:
             tx_list.append(tx.__str__())
         hash_str = ''.join(tx_list)
-        hash = BlockchainUtils.hash(hash_str)
+        hash = BlockchainUtils.hash(hash_str).hexdigest()
         last_hash = copy.copy(self.blocks[-1].hash)
         
         new_block = forger_wallet.create_block(
             covered_transactions,
             last_hash,
-            hash.hexdigest(),
+            hash,
             len(self.blocks))
         
         self.blocks.append(new_block)
