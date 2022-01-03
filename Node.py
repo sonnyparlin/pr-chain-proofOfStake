@@ -6,8 +6,6 @@ from NodeAPI import NodeAPI
 from Message import Message
 from BlockchainUtils import BlockchainUtils
 import copy
-import json
-
 
 class Node():
 
