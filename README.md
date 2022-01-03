@@ -4,17 +4,33 @@ First activate your environment with:
 source env/bin/activate
 ```
 
-Start the first node
+Generate a wallet from the command line
 ```
-python Main.py localhost 10001 5100 keys/genesisPrivateKey.pem
+python Wallet.py <name>
 ```
+This will generate 3 files
+* name_publicKey.pem
+* name_privateKey.pem
+* name_address.txt
+
+Move these files into the keys/ folder and the start the app as follows.
+```
+python Main.py localhost 10001 5100 keys/name_privateKey.pem
+```
+This starts the root node for the blockchain.
+
+Create a staker's node:
+```
+python Wallet.py staker
+```
+Move key files into the keys directory.
 
 Start a new staking node
 ```
-python Main.py localhost 10002 5101 keys/stakerPrivateKey.pem 
+python Main.py localhost 10002 5101 keys/staker_privateKey.pem 
 ```
 
-Start an additional non staking node (as many as you want, just make sure they have unique node and api ports)
+Start an additional non staking nodes (as many as you want, just make sure they have unique node and api ports if you run them on the same machine)
 ```
 python Main.py localhost 10002 5101
 ```
