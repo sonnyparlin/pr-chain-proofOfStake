@@ -36,8 +36,8 @@ class Wallet():
         transaction.add_signature(signature)
         return transaction
 
-    def create_block(self, transactions, last_hash, block_count):
-        block = Block(transactions, last_hash, 
+    def create_block(self, transactions, last_hash, hash, block_count):
+        block = Block(transactions, last_hash, hash,
             self.publicKeyString(), block_count)
         signature = self.sign(block.payload())
         block.add_signature(signature)

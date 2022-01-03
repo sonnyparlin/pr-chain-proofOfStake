@@ -2,6 +2,7 @@ from Block import Block
 from BlockchainUtils import BlockchainUtils
 from AccountModel import AccountModel
 from ProofOfStake import ProofOfStake
+import copy
 
 class Blockchain():
     def __init__(self):
@@ -99,10 +100,19 @@ class Blockchain():
         covered_transactions = self.get_covered_transactions_set(
             transaction_from_pool)
         self.execute_transactions(covered_transactions)
+        tx_list=[]
+        for tx in covered_transactions:
+            tx_list.append(tx.__str__())
+        hash_str = ''.join(tx_list)
+        hash = BlockchainUtils.hash(hash_str)
+        last_hash = copy.copy(self.blocks[-1].hash)
+        
         new_block = forger_wallet.create_block(
-            covered_transactions, 
-            BlockchainUtils.hash(self.blocks[-1].payload()).hexdigest(),
+            covered_transactions,
+            last_hash,
+            hash.hexdigest(),
             len(self.blocks))
+        
         self.blocks.append(new_block)
         return new_block
 

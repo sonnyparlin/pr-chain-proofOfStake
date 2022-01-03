@@ -15,6 +15,9 @@ class Transaction():
         self.timestamp = time.time()
         self.signature = ''
 
+    def __str__(self):
+        return f'{self.amount}:{self.id}:{self.receiver_address}:{self.sender_address}:{self.signature}:{self.timestamp}:{self.type}'
+
     def to_json(self):
         #return self.__dict__
         data = {}

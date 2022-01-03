@@ -2,10 +2,11 @@ import time
 import copy
 
 class Block():
-    def __init__(self, transactions, last_hash, forger, block_count):
+    def __init__(self, transactions, last_hash, hash, forger, block_count):
         self.block_count = block_count
         self.transactions = transactions
         self.last_hash = last_hash
+        self.hash = hash
         self.forger = forger
         self.timestamp = time.time()
         self.signature = ''
@@ -14,6 +15,7 @@ class Block():
         data = {}
         data['block_count'] = self.block_count
         data['last_hash'] = self.last_hash
+        data['hash'] = self.hash
         data['forger'] = self.forger
         data['timestamp'] = self.timestamp
         data['signature'] = self.signature
@@ -33,6 +35,6 @@ class Block():
 
     @staticmethod
     def genesis():
-        genesis_block = Block([], 'genesis_hash', 'genesis', 0)
+        genesis_block = Block([], 'first', '*prawn-genesis-hash*', 'genesis', 0)
         genesis_block.timestamp = 0
         return genesis_block
