@@ -28,6 +28,7 @@ python Interaction.py
 ```python
 @route('/info', methods=['GET'])
 @route('/wallet/<address>', methods=['GET'])
+@route('/txhistory/<address>', methods=['GET'])
 @route('/blockchain', methods=['GET'])
 @route('/transaction-pool', methods=['GET'])
 @route('/transact', methods=['POST'])
@@ -56,3 +57,12 @@ post_transaction(alice, alice, 25, 'STAKE')
 bob = Wallet()
 post_transaction(alice, bob, 1, 'TRANSFER')
 ```
+
+### TODO
+
+1. Proof of stake upgrade:
+Currently, if the validating node is unavailable, transactions don't get added to the blockchain. We need to have a fall back for when a staker's node is unavailable.
+2. Front end design
+3. Liquidity???
+4. Onboarding/offboarding solutions
+5. ICO???

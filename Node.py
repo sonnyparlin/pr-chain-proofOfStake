@@ -6,6 +6,7 @@ from NodeAPI import NodeAPI
 from Message import Message
 from BlockchainUtils import BlockchainUtils
 import copy
+import json
 
 
 class Node():
@@ -29,8 +30,20 @@ class Node():
         self.api.inject_node(self)
         self.api.start(port)
 
-    def handle_balance_request(self, publickey):
-        return self.blockchain.get_balance(publickey)
+    def handle_info_request(self, publickey):
+        return self.blockchain.get_info(publickey)
+
+    def handle_transaction_history(self, publickey):
+        address_block_history = []
+        for attr,val in self.blockchain.to_json().items():
+            if attr == 'blocks':
+                for block in val:
+                    for tx in block['transactions']:
+                        if publickey == tx['sender_address'] or \
+                                publickey == tx['receiver_address']:
+                            address_block_history.append(tx)
+        return address_block_history
+
 
     def handle_transaction(self, transaction):
         data = transaction.payload()

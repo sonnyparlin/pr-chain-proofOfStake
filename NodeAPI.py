@@ -17,14 +17,17 @@ class NodeAPI(FlaskView):
         global node
         node = injected_node
 
-    @route('/info', methods=['GET'])
-    def info(self):
-        return 'This is the beginning of our API', 200
-
     @route('/wallet/<address>', methods=['GET'])
     def get_wallet_info(self, address):
-        balance = node.handle_balance_request(address)
-        json_string = {"address": address, "balance": balance}
+        #balance = node.handle_balance_request(address)
+        json_string = node.handle_info_request(address)
+        json_string2 = node.handle_transaction_history(address)
+        #json_string = {"address": address, "balance": balance}
+        return jsonify([json_string,json_string2]), 200
+    
+    @route('/txhistory/<address>', methods=['GET'])
+    def get_wallet_history(sef, address):
+        json_string = node.handle_transaction_history(address)
         return jsonify(json_string), 200
 
     @route('/blockchain', methods=['GET'])

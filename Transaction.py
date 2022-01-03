@@ -16,7 +16,16 @@ class Transaction():
         self.signature = ''
 
     def to_json(self):
-        return self.__dict__
+        #return self.__dict__
+        data = {}
+        data['amount'] = self.amount
+        data['id'] = self.id
+        data['receiver_address'] = self.receiver_address
+        data['sender_address'] = self.sender_address
+        data['signature'] = self.signature
+        data['timestamp'] = self.timestamp
+        data['type'] = self.type
+        return data
 
     def add_signature(self, signature):
         self.signature = signature

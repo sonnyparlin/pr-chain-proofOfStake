@@ -4,7 +4,7 @@ from Crypto.Hash import SHA256
 from BlockchainUtils import BlockchainUtils
 from Transaction import Transaction
 from Block import Block
-import uuid
+import sys
 
 class Wallet():
 
@@ -12,8 +12,6 @@ class Wallet():
         self.keyPair = RSA.generate(2048)
         h=SHA256.new(self.keyPair.public_key().exportKey().hex().encode('utf-8'))
         self.address = 'pv1' + h.hexdigest()[0:41]
-        # self.address_list = []
-        # self.address_list.append(self.address)
     
     def from_key(self, file):
         key = ''
@@ -21,17 +19,13 @@ class Wallet():
             key = RSA.importKey(key_file.read())
         self.keyPair = key
         h=SHA256.new(self.keyPair.public_key().exportKey().hex().encode('utf-8'))
-        self.address = 'pr1' + h.hexdigest()[0:41]
+        self.address = 'pv1' + h.hexdigest()[0:41]
 
     def sign(self, data):
         dataHash = BlockchainUtils.hash(data)
         signatureSchemeObject = PKCS1_v1_5.new(self.keyPair)
         signature = signatureSchemeObject.sign(dataHash)
-        return signature.hex()
-
-    # def generate_new_address(self):
-    #     self.address = 'prawnv1' + uuid.uuid1().hex
-    #     self.address_list.append(self.address)
+        return signature.hex()        
 
     def publicKeyString(self):
         return self.keyPair.publickey().exportKey('PEM').decode('utf-8')
@@ -56,3 +50,24 @@ class Wallet():
         publicKey = RSA.importKey(publicKeyString)
         signatureSchemeObject = PKCS1_v1_5.new(publicKey)
         return signatureSchemeObject.verify(dataHash, signature)
+
+    @staticmethod
+    def create_wallet_and_export_keys(filename):
+        wallet = Wallet()
+        with open(filename + '_privateKey.pem', "wb") as file:
+            file.write(wallet.keyPair.exportKey('PEM'))
+            file.close()
+
+        with open(filename + '_publicKey.pem', "wb") as file:
+            file.write(wallet.keyPair.publickey().exportKey('PEM'))
+            file.close()
+
+        with open(filename + '_address.txt', "wb") as file:
+            file.write(wallet.address.encode('utf8'))
+            file.close()
+
+def main():
+    Wallet.create_wallet_and_export_keys(sys.argv[1])
+
+if __name__ == '__main__':
+    main()

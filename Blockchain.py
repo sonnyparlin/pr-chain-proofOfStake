@@ -47,9 +47,13 @@ class Blockchain():
 
     def get_balance(self, publickey):
         return self.accountModel.get_balance(publickey)
+    
+    def get_info(self, publickey):
+        return self.accountModel.get_info(publickey)
 
     def transaction_covered(self, transaction):
         if transaction.type == 'EXCHANGE':
+            # Run crypto checks here to verify exchange wallet
             return True
         sender_balance = self.accountModel.get_balance(
             transaction.sender_address)
@@ -61,17 +65,30 @@ class Blockchain():
             self.execute_transaction(transaction)
 
     def execute_transaction(self, transaction):
-        sender = transaction.sender_address
-        receiver = transaction.receiver_address
+
+        if transaction.sender_address not in self.accountModel.balances.keys():
+            self.accountModel.add_account(transaction.sender_address, transaction.sender_public_key)
+        
+        if transaction.receiver_address not in self.accountModel.balances.keys():
+            self.accountModel.add_account(transaction.receiver_address, transaction.receiver_public_key)
+
+        sender_address = transaction.sender_address
+        receiver_address = transaction.receiver_address
         amount = transaction.amount
 
         if transaction.type == 'STAKE':
-            if sender == receiver:
+            if sender_address == receiver_address:
                 self.pos.update(transaction.sender_public_key, amount)
-                self.accountModel.update_balance(sender, -amount)
+                self.accountModel.update_balance(
+                    sender_address,
+                    -amount)
         else:              
-            self.accountModel.update_balance(sender, -amount)
-            self.accountModel.update_balance(receiver, amount)
+            self.accountModel.update_balance(
+                sender_address,
+                -amount)
+            self.accountModel.update_balance(
+                receiver_address, 
+                amount)
                     
     def next_forger(self):
         last_hash = BlockchainUtils.hash(
