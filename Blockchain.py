@@ -112,6 +112,9 @@ class Blockchain():
             last_hash,
             hash,
             len(self.blocks))
+
+        # todo:
+        # reward the forger
         
         self.blocks.append(new_block)
         return new_block
