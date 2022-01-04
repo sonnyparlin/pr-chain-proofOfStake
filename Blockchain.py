@@ -12,10 +12,10 @@ class Blockchain():
 
             
     def add_block(self, block):
+        self.execute_transactions(block.transactions)
         print('adding via add_block()')
         if self.blocks[-1].block_count < block.block_count:
             self.blocks.append(block)
-        self.execute_transactions(block.transactions)
 
     def to_json(self):
         data = {}
@@ -111,8 +111,8 @@ class Blockchain():
         # todo:
         # reward the forger
         print('adding via append')
-        self.blocks.append(new_block)
         self.execute_transactions(new_block.transactions)
+        self.blocks.append(new_block)
         return new_block
 
     def transaction_exists(self, transaction):
