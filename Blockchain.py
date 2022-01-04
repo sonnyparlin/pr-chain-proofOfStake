@@ -10,10 +10,12 @@ class Blockchain():
         self.accountModel = AccountModel()
         self.pos = ProofOfStake()
 
+            
     def add_block(self, block):
-        self.execute_transactions(block.transactions)
+        print('adding via add_block()')
         if self.blocks[-1].block_count < block.block_count:
             self.blocks.append(block)
+        self.execute_transactions(block.transactions)
 
     def to_json(self):
         data = {}
@@ -62,10 +64,10 @@ class Blockchain():
 
     def execute_transaction(self, transaction):
 
-        if transaction.sender_address not in self.accountModel.balances.keys():
+        if transaction.sender_address not in self.accountModel.accounts:
             self.accountModel.add_account(transaction.sender_address, transaction.sender_public_key)
         
-        if transaction.receiver_address not in self.accountModel.balances.keys():
+        if transaction.receiver_address not in self.accountModel.accounts:
             self.accountModel.add_account(transaction.receiver_address, transaction.receiver_public_key)
 
         sender_address = transaction.sender_address
@@ -93,7 +95,6 @@ class Blockchain():
     def create_block(self, transaction_from_pool, forger_wallet):
         covered_transactions = self.get_covered_transactions_set(
             transaction_from_pool)
-        self.execute_transactions(covered_transactions)
         tx_list=[]
         for tx in covered_transactions:
             tx_list.append(tx.__str__())
@@ -109,8 +110,9 @@ class Blockchain():
 
         # todo:
         # reward the forger
-        
+        print('adding via append')
         self.blocks.append(new_block)
+        self.execute_transactions(new_block.transactions)
         return new_block
 
     def transaction_exists(self, transaction):
