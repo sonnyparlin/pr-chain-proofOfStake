@@ -1,7 +1,9 @@
 ### Start the app
-First activate your environment with:
+First create and activate your virtual environment with:
 ```
+python -m venv env
 source env/bin/activate
+pip install -r requirements.txt
 ```
 
 Generate a wallet from the command line
@@ -13,7 +15,7 @@ This will generate 3 files
 * name_privateKey.pem
 * name_address.txt
 
-Move these files into the keys/ folder and the start the app as follows.
+Move these files into the keys/ folder and then start the app as follows.
 ```
 python Main.py localhost 10001 5100 keys/name_privateKey.pem
 ```
@@ -25,7 +27,7 @@ python Wallet.py staker
 ```
 Move key files into the keys directory.
 
-Start a new staking node
+In a second terminal window start a new staking node:
 ```
 python Main.py localhost 10002 5101 keys/staker_privateKey.pem 
 ```
