@@ -57,8 +57,7 @@ class Node():
                                 'TRANSACTION', transaction)
             encoded_message = BlockchainUtils.encode(message)
             self.p2p.broadcast(encoded_message)
-            forgingRequired = self.transaction_pool.forging_required()
-            if forgingRequired:
+            if self.transaction_pool.forging_required():
                 self.forge()
 
     def handle_block(self, block):
@@ -68,6 +67,7 @@ class Node():
 
         block_count_valid = self.blockchain.block_count_valid(block)
         last_block_hash_valid = self.blockchain.last_block_hash_valid(block)
+        #print(f'last_block_hash_valid: {last_block_hash_valid}')
         forger_valid = self.blockchain.forger_valid(block)
         transactions_valid = self.blockchain.transactions_valid(block.transactions)
         signature_valid = Wallet.valid_signature(block_hash, signature, forger)
@@ -75,6 +75,7 @@ class Node():
         if not block_count_valid:
             self.request_chain()
         if last_block_hash_valid and forger_valid and transactions_valid and signature_valid:
+            #print(f'block being added by {forger}')
             self.blockchain.add_block(block)
             self.transaction_pool.remove_from_pool(block.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK', block)
@@ -89,9 +90,12 @@ class Node():
         local_blockchain_copy = copy.deepcopy(self.blockchain)
         local_block_count = len(local_blockchain_copy.blocks)
         incoming_blockchain_count = len(blockchain.blocks)
+        #print(f'local_block_count: {local_block_count}, port {self.port}')
+        #print(f'incoming_blockchain_count: {incoming_blockchain_count}')
         if local_block_count < incoming_blockchain_count:
             for block_number, block in enumerate(blockchain.blocks):
                 if block_number >= local_block_count:
+                    print("Blocks are getting added via p2p update")
                     local_blockchain_copy.add_block(block)
                     self.transaction_pool.remove_from_pool(block.transactions)
             self.blockchain = local_blockchain_copy
@@ -110,5 +114,6 @@ class Node():
             print('i am not the next forger')
     
     def request_chain(self):
+        #print(f'{self.port} requesting blockchain update')
         message = Message(self.p2p.socketConnector, 'BLOCKCHAINREQUEST', None)
         self.p2p.broadcast(BlockchainUtils.encode(message))

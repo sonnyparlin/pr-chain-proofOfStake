@@ -27,16 +27,16 @@ if __name__ == '__main__':
     post_transaction(alice, bob, 1, TX_TRANSFER)
     post_transaction(alice, bob, 1, TX_TRANSFER)
 
-    # post_transaction(alice, bob, 1, 'TRANSFER')
-    # post_transaction(alice, bob, 1, 'TRANSFER')
-    # post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
 
-    # post_transaction(alice, bob, 1, 'TRANSFER')
-    # post_transaction(alice, bob, 1, 'TRANSFER')
-    # post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
 
-    # post_transaction(alice, bob, 1, 'TRANSFER')
-    # post_transaction(alice, bob, 1, 'TRANSFER')
-    # post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
+    post_transaction(alice, bob, 1, 'TRANSFER')
     
     

@@ -30,12 +30,8 @@ class Blockchain():
             return False
 
     def last_block_hash_valid(self, block):
-        latest_blockchain_block_hash = BlockchainUtils.hash(
-            self.blocks[-1].payload()).hexdigest()
-        if latest_blockchain_block_hash == block.last_hash:
-            return True
-        else:
-            return False
+        latest_blockchain_block_hash = copy.copy(self.blocks[-1].hash)
+        return latest_blockchain_block_hash == block.last_hash
 
     def get_covered_transactions_set(self, transactions):
         covered_transactions = []
@@ -58,7 +54,6 @@ class Blockchain():
             return True
         sender_balance = self.accountModel.get_balance(
             transaction.sender_address)
-        print(f'sender_balance: {sender_balance}')
         return sender_balance >= transaction.amount
 
     def execute_transactions(self, transactions):
@@ -92,8 +87,7 @@ class Blockchain():
                 amount)
                     
     def next_forger(self):
-        last_hash = BlockchainUtils.hash(
-            self.blocks[-1].payload()).hexdigest()
+        last_hash = copy.copy(self.blocks[-1].hash)
         return self.pos.forger(last_hash)
 
     def create_block(self, transaction_from_pool, forger_wallet):
