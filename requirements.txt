@@ -5,3 +5,4 @@ Flask-Classful==0.14.2
 p2pnetwork==0.0.3
 requests==2.22.0
 PyCryptodome==3.12.0
+pytest==6.2.5
