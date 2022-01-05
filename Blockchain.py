@@ -12,7 +12,7 @@ class Blockchain():
 
     def add_block(self, block):
         self.execute_transactions(block.transactions)
-        print('adding via add_block()')
+        #print('adding via add_block()')
         if self.blocks[-1].block_count < block.block_count:
             self.blocks.append(block)
         if self.blocks[-1].last_hash != self.blocks[-2].hash:
@@ -111,7 +111,7 @@ class Blockchain():
 
         # todo:
         # reward the forger
-        print('adding via append')
+        #print('adding via append')
         self.execute_transactions(new_block.transactions)
         self.blocks.append(new_block)
         return new_block

@@ -4,7 +4,7 @@ from Wallet import Wallet
 from Blockchain import Blockchain
 from AccountModel import AccountModel
 from Transaction import Transaction
-import json
+import time
 
 def test_genesis():
     genesis = Block.genesis()
@@ -62,6 +62,80 @@ def blockchain_three_blocks():
 
     return [blockchain, accountModel, alice]
 
+def test_alot_of_blocks(blockchain_three_blocks):
+    blockchain = blockchain_three_blocks[0]
+    accountModel = blockchain_three_blocks[1]
+    alice = blockchain_three_blocks[2]
+    bob = Wallet()
+    forger= Wallet()
+    exchange = Wallet()
+    transaction = Transaction(exchange, alice, 10000, 'EXCHANGE')
+
+    for tx in [transaction]:            
+        if tx.receiver_address not in accountModel.accounts:
+            accountModel.add_account(tx.receiver_address, tx.receiver_public_key)
+
+    accountModel.update_balance(alice.address, 10000)
+    block = Block([transaction], blockchain.blocks[-1].hash, 'foo-hash4', forger, 4)
+    blockchain.add_block(block)
+
+    start = time.time()
+    tx = Transaction(alice, bob, 1, 'TRANSFER')
+    if tx.receiver_address not in accountModel.accounts:
+        accountModel.add_account(tx.receiver_address, tx.receiver_public_key)
+
+    for i in range(10000):
+        if blockchain.transaction_covered(tx):
+            accountModel.update_balance(alice.address, -1)
+            accountModel.update_balance(bob.address, 1)
+            block = Block([tx], blockchain.blocks[-1].hash, 'foo-hash4-'+str(i), forger, 4+i)
+            blockchain.add_block(block)
+    end = time.time()
+    elapsed = end-start
+
+    assert len(blockchain.blocks) == 10004
+    assert accountModel.get_balance(alice.address) == 80
+    assert accountModel.get_balance(bob.address) == 10000
+    assert elapsed < 5
+
+def test_alot_of_transactions_in_one_block(blockchain_three_blocks):
+    blockchain = blockchain_three_blocks[0]
+    accountModel = blockchain_three_blocks[1]
+    alice = blockchain_three_blocks[2]
+    bob = Wallet()
+    forger= Wallet()
+    exchange = Wallet()
+    tx = Transaction(exchange, alice, 1000, 'EXCHANGE')
+
+    if tx.receiver_address not in accountModel.accounts:
+        accountModel.add_account(tx.receiver_address, tx.receiver_public_key)
+
+    accountModel.update_balance(alice.address, 10000)
+    block = Block([tx], blockchain.blocks[-1].hash, 'foo-hash4', forger, 4)
+    blockchain.add_block(block)
+
+    start = time.time()
+    txs = []
+    
+    tx = Transaction(alice, bob, 1, 'TRANSFER')
+    if tx.receiver_address not in accountModel.accounts:
+        accountModel.add_account(tx.receiver_address, tx.receiver_public_key)
+    for i in range(10000):
+        if blockchain.transaction_covered(tx):
+            txs.append(tx)
+    accountModel.update_balance(alice.address, -10000)
+    accountModel.update_balance(bob.address, 10000)
+    
+    block = Block(txs, blockchain.blocks[-1].hash, 'foo-hash5', forger, 5)
+    blockchain.add_block(block)
+    end = time.time()
+    elapsed = end-start
+
+    assert len(blockchain.blocks) == 6
+    assert accountModel.get_balance(alice.address) == 80
+    assert accountModel.get_balance(bob.address) == 10000
+    assert elapsed < 1
+
 def test_block_1_is_valid_block(blockchain_three_blocks):
     blockchain = blockchain_three_blocks[0]
     assert isinstance(blockchain, Blockchain)
@@ -75,11 +149,44 @@ def test_block_1_is_valid_block(blockchain_three_blocks):
 
 def test_string_of_last_hashes_are_valid(blockchain_three_blocks):
     blockchain = blockchain_three_blocks[0]
-    for i in range(4):
+    accountModel = blockchain_three_blocks[1]
+    alice = blockchain_three_blocks[2]
+    bob = Wallet()
+    forger= Wallet()
+    exchange = Wallet()
+    transaction = Transaction(exchange, alice, 10000, 'EXCHANGE')
+
+    for tx in [transaction]:            
+        if tx.receiver_address not in accountModel.accounts:
+            accountModel.add_account(tx.receiver_address, tx.receiver_public_key)
+
+    accountModel.update_balance(alice.address, 10000)
+    block = Block([transaction], blockchain.blocks[-1].hash, 'foo-hash4', forger, 4)
+    blockchain.add_block(block)
+
+    start = time.time()
+    tx = Transaction(alice, bob, 1, 'TRANSFER')
+    if tx.receiver_address not in accountModel.accounts:
+        accountModel.add_account(tx.receiver_address, tx.receiver_public_key)
+
+    for i in range(10000):
+        if blockchain.transaction_covered(tx):
+            accountModel.update_balance(alice.address, -1)
+            accountModel.update_balance(bob.address, 1)
+            block = Block([tx], blockchain.blocks[-1].hash, 'foo-hash4-'+str(i), forger, 4+i)
+            blockchain.add_block(block)
+    end = time.time()
+    elapsed = end-start
+
+    for i in range(len(blockchain.blocks)):
         if i == 0:
             next
         else:
             assert blockchain.blocks[i].last_hash == blockchain.blocks[i-1].hash
+
+    assert elapsed < 1
+    assert accountModel.get_balance(alice.address) == 80
+
 
 def test_balances_are_correct(blockchain_three_blocks):
     accountModel = blockchain_three_blocks[1]
