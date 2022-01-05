@@ -10,12 +10,13 @@ class Blockchain():
         self.accountModel = AccountModel()
         self.pos = ProofOfStake()
 
-            
     def add_block(self, block):
         self.execute_transactions(block.transactions)
         print('adding via add_block()')
         if self.blocks[-1].block_count < block.block_count:
             self.blocks.append(block)
+        if self.blocks[-1].last_hash != self.blocks[-2].hash:
+            raise Exception('The block last_hash must be correct')
 
     def to_json(self):
         data = {}
