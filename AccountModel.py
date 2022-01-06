@@ -1,4 +1,4 @@
-
+from Wallet import Wallet
 
 class AccountModel():
 
@@ -6,24 +6,17 @@ class AccountModel():
         self.accounts = []
         self.account = {}
 
-    def add_account(self, address, publicKey):
+    def add_or_update_account(self, address, publicKey, 
+                                stake_wallet_address=None, staking=0):
+        
         if not address in self.accounts:
             self.accounts.append(address)
-            self.account[address]=[{'balance': 0,
-                            'address': address,
-                            'publicKey': publicKey}]
+        
+        self.account[address]=[{'staking': staking,
+                        'stake_wallet_address': stake_wallet_address,
+                        'address': address,
+                        'publicKey': publicKey}]
 
-    def get_balance(self, address):
-        if address in self.account:
-            return self.account[address][0]['balance']
-        else:
-            return 0
-
-    def get_info(self, address):
-        if address in self.account:
-            return self.account[address][0]
-        else:
-            return {"address": "Not found", "balance": 0, "publicKey": "None"}
-
-    def update_balance(self, address, amount):
-        self.account[address][0]['balance'] += amount
+    def get_info(self, address, balance):
+        self.account[address][0]['balance'] = balance
+        return self.account[address]

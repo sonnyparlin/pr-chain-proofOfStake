@@ -12,6 +12,13 @@ class Wallet():
         self.keyPair = RSA.generate(2048)
         h=SHA256.new(self.keyPair.public_key().exportKey().hex().encode('utf-8'))
         self.address = 'pv1' + h.hexdigest()[0:41]
+
+    @property
+    def balance(self):
+        """
+        Calls Wallet.calculate_balance()
+        """
+        return Wallet.calculate_balance(self.blockchain, self.address)
     
     def from_key(self, file):
         key = ''
@@ -65,6 +72,26 @@ class Wallet():
         with open(filename + '_address.txt', "wb") as file:
             file.write(wallet.address.encode('utf8'))
             file.close()
+    
+    @staticmethod
+    def calculate_balance(blockchain, address):
+        """
+        Uses transaction data to calculate balance
+        The balance is found by adding the output values of the address since the most recent transaction by that address.
+        """
+        balance = 0
+
+        if not blockchain:
+            return balance
+
+        for block in blockchain.blocks:
+            for transaction in block.transactions:
+                if transaction.sender_address == address:
+                    balance -= transaction.amount
+                elif address == transaction.receiver_address:
+                    balance += transaction.amount
+
+        return balance
 
 def main():
     Wallet.create_wallet_and_export_keys(sys.argv[1])

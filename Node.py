@@ -1,10 +1,12 @@
 from Blockchain import Blockchain
+from Transaction import Transaction
 from TransactionPool import TransactionPool
 from Wallet import Wallet
 from SocketCommunication import SocketCommunication
 from NodeAPI import NodeAPI
 from Message import Message
 from BlockchainUtils import BlockchainUtils
+from config import FORGE_REWARD, TX_REWARD, TX_STAKE, TX_TRANSFER, TX_EXCHANGE
 import copy
 
 class Node():
@@ -28,8 +30,11 @@ class Node():
         self.api.inject_node(self)
         self.api.start(port)
 
-    def handle_info_request(self, publickey):
-        return self.blockchain.get_info(publickey)
+    def handle_info_request(self, publickey, balance):
+        return self.blockchain.get_info(publickey, balance)
+
+    def get_balance(self, address):
+        return Wallet.calculate_balance(self.blockchain, address)
 
     def handle_transaction_history(self, publickey):
         address_block_history = []
@@ -107,6 +112,12 @@ class Node():
                 self.transaction_pool.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK', block)
             self.p2p.broadcast(BlockchainUtils.encode(message))
+         
+            # exchange = Wallet()
+            # reward_tx=Transaction(exchange, self.wallet, FORGE_REWARD, TX_REWARD)
+            # block = self.blockchain.create_block([reward_tx], self.wallet)
+            # message = Message(self.p2p.socketConnector, 'BLOCK', block)
+            # self.p2p.broadcast(BlockchainUtils.encode(message))
         else:
             print('i am not the next forger')
     

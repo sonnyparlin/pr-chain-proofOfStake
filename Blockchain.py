@@ -2,6 +2,8 @@ from Block import Block
 from BlockchainUtils import BlockchainUtils
 from AccountModel import AccountModel
 from ProofOfStake import ProofOfStake
+from Wallet import Wallet
+from config import TX_EXCHANGE, TX_REWARD, TX_STAKE
 import copy
 
 class Blockchain():
@@ -11,12 +13,14 @@ class Blockchain():
         self.pos = ProofOfStake()
 
     def add_block(self, block):
-        self.execute_transactions(block.transactions)
         #print('adding via add_block()')
+        if self.blocks[-1].hash != block.last_hash:
+            raise Exception('The block last_hash must be correct')
+
+        self.add_accounts(block.transactions)
+
         if self.blocks[-1].block_count < block.block_count:
             self.blocks.append(block)
-        if self.blocks[-1].last_hash != self.blocks[-2].hash:
-            raise Exception('The block last_hash must be correct')
 
     def to_json(self):
         data = {}
@@ -27,13 +31,10 @@ class Blockchain():
         return data
 
     def block_count_valid(self, block):
-        if self.blocks[-1].block_count == block.block_count - 1:
-            return True
-        else:
-            return False
+        return self.blocks[-1].block_count == block.block_count - 1
 
     def last_block_hash_valid(self, block):
-        latest_blockchain_block_hash = copy.copy(self.blocks[-1].hash)
+        latest_blockchain_block_hash = self.blocks[-1].hash
         return latest_blockchain_block_hash == block.last_hash
 
     def get_covered_transactions_set(self, transactions):
@@ -46,48 +47,30 @@ class Blockchain():
         return covered_transactions
 
     def get_balance(self, publickey):
-        return self.accountModel.get_balance(publickey)
+        return Wallet.calculate_balance(self, publickey)
     
-    def get_info(self, publickey):
-        return self.accountModel.get_info(publickey)
+    def get_info(self, publickey, balance):
+        return self.accountModel.get_info(publickey, balance)
 
     def transaction_covered(self, transaction):
-        if transaction.type == 'EXCHANGE':
+        if transaction.type == TX_EXCHANGE or transaction.type == TX_REWARD:
             # Run crypto checks here to verify exchange wallet
             return True
-        sender_balance = self.accountModel.get_balance(
-            transaction.sender_address)
+        sender_balance = Wallet.calculate_balance(self, transaction.sender_address)
         return sender_balance >= transaction.amount
 
-    def execute_transactions(self, transactions):
+    def add_accounts(self, transactions):
         for transaction in transactions:
-            self.execute_transaction(transaction)
+            self.add_account(transaction)
 
-    def execute_transaction(self, transaction):
-
-        if transaction.sender_address not in self.accountModel.accounts:
-            self.accountModel.add_account(transaction.sender_address, transaction.sender_public_key)
-        
-        if transaction.receiver_address not in self.accountModel.accounts:
-            self.accountModel.add_account(transaction.receiver_address, transaction.receiver_public_key)
-
-        sender_address = transaction.sender_address
-        receiver_address = transaction.receiver_address
+    def add_account(self, transaction):       
         amount = transaction.amount
-
-        if transaction.type == 'STAKE':
-            if sender_address == receiver_address:
-                self.pos.update(transaction.sender_public_key, amount)
-                self.accountModel.update_balance(
-                    sender_address,
-                    -amount)
-        else:              
-            self.accountModel.update_balance(
-                sender_address,
-                -amount)
-            self.accountModel.update_balance(
-                receiver_address, 
-                amount)
+        if transaction.type == TX_STAKE:
+            self.accountModel.add_or_update_account(transaction.sender_address, transaction.sender_public_key, transaction.receiver_address, transaction.amount)
+            self.pos.update(transaction.sender_public_key, amount)
+        else:
+            self.accountModel.add_or_update_account(transaction.sender_address, transaction.sender_public_key)
+            self.accountModel.add_or_update_account(transaction.receiver_address, transaction.receiver_public_key)
                     
     def next_forger(self):
         last_hash = copy.copy(self.blocks[-1].hash)
@@ -101,7 +84,7 @@ class Blockchain():
             tx_list.append(tx.__str__())
         hash_str = ''.join(tx_list)
         hash = BlockchainUtils.hash(hash_str).hexdigest()
-        last_hash = copy.copy(self.blocks[-1].hash)
+        last_hash = self.blocks[-1].hash
         
         new_block = forger_wallet.create_block(
             covered_transactions,
@@ -109,10 +92,7 @@ class Blockchain():
             hash,
             len(self.blocks))
 
-        # todo:
-        # reward the forger
-        #print('adding via append')
-        self.execute_transactions(new_block.transactions)
+        self.add_accounts(new_block.transactions)
         self.blocks.append(new_block)
         return new_block
 
@@ -126,14 +106,8 @@ class Blockchain():
     def forger_valid(self, block):
         forger_public_key = self.pos.forger(block.last_hash)
         proposed_block_forger = block.forger
-        if forger_public_key == proposed_block_forger:
-            return True
-        else:
-            return False
-
+        return forger_public_key == proposed_block_forger
+            
     def transactions_valid(self, transactions):
         covered_transactions = self.get_covered_transactions_set(transactions)
-        if len(covered_transactions) == len(transactions):
-            return True
-        else:
-            return False
+        return len(covered_transactions) == len(transactions)

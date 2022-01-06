@@ -19,7 +19,9 @@ class NodeAPI(FlaskView):
 
     @route('/wallet/<address>', methods=['GET'])
     def get_wallet_info(self, address):
-        json_string = node.handle_info_request(address)
+        balance = node.get_balance(address)
+        json_string = node.handle_info_request(address, balance)
+        #json_string = {"address": address, "balance": balance, "publicKey": node.wallet.publicKeyString()}
         json_string2 = node.handle_transaction_history(address)
         return jsonify([json_string,json_string2]), 200
     
