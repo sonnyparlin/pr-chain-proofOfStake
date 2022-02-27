@@ -6,7 +6,7 @@ import time
 
 def post_transaction(sender, receiver, amount, type):
     transaction = sender.create_transaction(receiver, amount, type=type)
-    url = 'http://localhost:5001/transact'
+    url = 'http://localhost:8000/transact'
     package = {'transaction': BlockchainUtils.encode(transaction)}
     request = requests.post(url, json=package)
     print(request.json())
